@@ -1,0 +1,129 @@
+body {
+            background-color: #122b2b;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        .welcome-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .welcome-card {
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid #a1c4a1;
+            border-radius: 20px;
+            padding: 50px;
+            background-color: transparent;
+            text-align: center;
+        }
+
+        .system-title {
+            font-family: 'Bebas Neue', sans-serif;
+            color: #a1c4a1;
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 8px #0a1919, 0 2px 0 rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            border-bottom: 2px solid #a1c4a1;
+            padding-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #a1c4a1;
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .description {
+            color: #a1c4a1;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .features-list {
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            color: #a1c4a1;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            opacity: 0.9;
+        }
+
+        .features-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #a1c4a1;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            background-color: #a1c4a1;
+            color: #122b2b;
+            font-weight: bold;
+            border-radius: 30px;
+            padding: 15px 40px;
+            font-size: 1rem;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-btn:hover {
+            background-color: #8fb08f;
+            color: #122b2b;
+            text-decoration: none;
+        }
+
+        .brain-placeholder {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background-color: rgba(161, 196, 161, 0.1);
+            border: 2px dashed #a1c4a1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #a1c4a1;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-card {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .system-title {
+                font-size: 2.5rem;
+                letter-spacing: 3px;
+            }
+        }
