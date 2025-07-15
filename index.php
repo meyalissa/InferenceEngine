@@ -94,18 +94,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $b = getVar(normalize_negation($m[2]), $statements, $vars, $varNames, $varIndex);
             $parsedPremises[] = "$a → $b";
         } elseif (preg_match('/(.+) or (.+)/', $premise, $m)) {
-            // Handle "or" statements
-            $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
-            $b = getVar(normalize_negation($m[2]), $statements, $vars, $varNames, $varIndex);
+            // Handle "or" statements with negation detection
+            $part1 = trim($m[1]);
+            $part2 = trim($m[2]);
+            if (preg_match('/^not (.+)/', $part1, $n1)) {
+                $a = '¬' . getVar(trim($n1[1]), $statements, $vars, $varNames, $varIndex);
+            } else {
+                $a = getVar($part1, $statements, $vars, $varNames, $varIndex);
+            }
+            if (preg_match('/^not (.+)/', $part2, $n2)) {
+                $b = '¬' . getVar(trim($n2[1]), $statements, $vars, $varNames, $varIndex);
+            } else {
+                $b = getVar($part2, $statements, $vars, $varNames, $varIndex);
+            }
             $parsedPremises[] = "$a ∨ $b";
         } elseif (preg_match('/(.+) and (.+)/', $premise, $m)) {
-            // Handle "and" statements
-            $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
-            $b = getVar(normalize_negation($m[2]), $statements, $vars, $varNames, $varIndex);
+            // Handle "and" statements with negation detection
+            $part1 = trim($m[1]);
+            $part2 = trim($m[2]);
+            if (preg_match('/^not (.+)/', $part1, $n1)) {
+                $a = '¬' . getVar(trim($n1[1]), $statements, $vars, $varNames, $varIndex);
+            } else {
+                $a = getVar($part1, $statements, $vars, $varNames, $varIndex);
+            }
+            if (preg_match('/^not (.+)/', $part2, $n2)) {
+                $b = '¬' . getVar(trim($n2[1]), $statements, $vars, $varNames, $varIndex);
+            } else {
+                $b = getVar($part2, $statements, $vars, $varNames, $varIndex);
+            }
             $parsedPremises[] = "$a ∧ $b";
         } elseif (preg_match('/not (.+)/', $premise, $m)) {
             // Handle negation statements
-            $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
+            $base = trim($m[1]);
+            $a = getVar($base, $statements, $vars, $varNames, $varIndex); // Use base statement for variable
             $parsedPremises[] = "¬$a";
         } else {
             // Handle simple statements
@@ -133,7 +154,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $parsedConclusion = "$a ∧ $b";
     } elseif (preg_match('/not (.+)/', $conclusionNorm, $m)) {
         // Handle negation statements in conclusion
-        $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
+        $base = trim($m[1]);
+        $a = getVar($base, $statements, $vars, $varNames, $varIndex); // Use base statement for variable
         $parsedConclusion = "¬$a";
     } else {
         // Handle simple statements in conclusion
@@ -236,12 +258,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         // Resolution: If p ∨ q and ¬p ∨ r, then q ∨ r.
         elseif (
-            in_array("$varNames[0] V $varNames[1]", $parsedPremises) &&
-            in_array("¬$varNames[0] V $varNames[2]", $parsedPremises) &&
-            $parsedConclusion == "$varNames[1] V $varNames[2]"
+            in_array("$varNames[0] ∨ $varNames[1]", $parsedPremises) &&
+            in_array("¬$varNames[0] ∨ $varNames[2]", $parsedPremises) &&
+            $parsedConclusion == "$varNames[1] ∨ $varNames[2]"
         ) {
-            $inferenceRule = "Resolution<br>";
-            $steps = "<br>1. {$varNames[0]} V {$varNames[1]} ({$vars[$varNames[0]]} or {$vars[$varNames[1]]})<br>2. ¬{$varNames[0]} V {$varNames[2]} (Not {$vars[$varNames[0]]} or {$vars[$varNames[2]]})<br>3. Conclusion:<br> {$varNames[1]} V {$varNames[2]}: {$vars[$varNames[1]]} or {$vars[$varNames[2]]}";
+            $inferenceRule = "Resolution";
+            $steps = "<br>1. {$varNames[0]} ∨ {$varNames[1]} ({$vars[$varNames[0]]} or {$vars[$varNames[1]]})<br>2. ¬{$varNames[0]} ∨ {$varNames[2]} (Not {$vars[$varNames[0]]} or {$vars[$varNames[2]]})<br>3. Conclusion:<br> {$varNames[1]} ∨ {$varNames[2]}: {$vars[$varNames[1]]} or {$vars[$varNames[2]]}";
             $valid = true;
         }
 
@@ -288,19 +310,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 </html>
-
-<!--enter statement per line -->
-
-
-
-    <!-- // // Step 4: Display rule of inference and steps
-    // echo "<h3>Rule of Inference:</h3>";
-    // echo "Type of Inference: $inferenceRule <br>";
-    // echo "Steps: $steps <br>";
-
-    // // Step 5: Conclusion validity check
-    // if ($valid) {
-    //     echo "<h3>Conclusion: Valid</h3>";
-    // } else {
-    //     echo "<h3>Conclusion: Invalid</h3>";
-    // } -->
