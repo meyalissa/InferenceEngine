@@ -68,11 +68,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             '/^(.*) does not (.*)$/i' => 'not $1 $2',
             '/^(.*) do not (.*)$/i'   => 'not $1 $2',
             '/^(.*) did not (.*)$/i'  => 'not $1 $2',
-            '/^(.*) is not (.*)$/i'   => 'not $1 $2',
-            '/^(.*) are not (.*)$/i'  => 'not $1 $2',
-            '/^(.*) was not (.*)$/i'  => 'not $1 $2',
-            '/^(.*) were not (.*)$/i' => 'not $1 $2',
-            '/^not (.+)$/i'           => 'not $1',
+            '/^(.*) is not (.*)$/i'   => 'not $1 is $2',
+            '/^(.*) are not (.*)$/i'  => 'not $1 are $2',
+            '/^(.*) was not (.*)$/i'  => 'not $1 was $2',
+            '/^(.*) were not (.*)$/i' => 'not $1 were $2',
+            '/not (.+)/i'             => 'not $1',
         ];
         foreach ($patterns as $pattern => $replace) {
             if (preg_match($pattern, $stmt, $m)) {
@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
             $b = getVar(normalize_negation($m[2]), $statements, $vars, $varNames, $varIndex);
             $parsedPremises[] = "$a ∧ $b";
-        } elseif (preg_match('/^not (.+)$/', $premise, $m)) {
+        } elseif (preg_match('/not (.+)/', $premise, $m)) {
             // Handle negation statements
             $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
             $parsedPremises[] = "¬$a";
@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
         $b = getVar(normalize_negation($m[2]), $statements, $vars, $varNames, $varIndex);
         $parsedConclusion = "$a ∧ $b";
-    } elseif (preg_match('/^not (.+)$/', $conclusionNorm, $m)) {
+    } elseif (preg_match('/not (.+)/', $conclusionNorm, $m)) {
         // Handle negation statements in conclusion
         $a = getVar(normalize_negation($m[1]), $statements, $vars, $varNames, $varIndex);
         $parsedConclusion = "¬$a";
@@ -198,12 +198,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         // Disjunctive Syllogism: If p ∨ q, ¬p, then q.
         elseif (
-            in_array("$varNames[0] V $varNames[1]", $parsedPremises) &&
+            in_array("$varNames[0] ∨ $varNames[1]", $parsedPremises) &&
             in_array("¬$varNames[0]", $parsedPremises) &&
             $parsedConclusion == "$varNames[1]"
         ) {
             $inferenceRule = "Disjunctive Syllogism";
-            $steps = "<br>1. {$varNames[0]} V {$varNames[1]} ({$vars[$varNames[0]]} or {$vars[$varNames[1]]})<br>2. ¬{$varNames[0]}: Not {$vars[$varNames[0]]} (Premise)<br>3. Conclusion:<br> {$varNames[1]}: {$vars[$varNames[1]]}";
+            $steps = "<br>1. {$varNames[0]} ∨ {$varNames[1]} ({$vars[$varNames[0]]} or {$vars[$varNames[1]]})<br>2. ¬{$varNames[0]}: Not {$vars[$varNames[0]]} (Premise)<br>3. Conclusion:<br> {$varNames[1]}: {$vars[$varNames[1]]}";
             $valid = true;
         }
         // Conjunction: If p, q, then p ∧ q.
@@ -228,10 +228,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Addition: If p, then p ∨ q.
         elseif (
             in_array("$varNames[0]", $parsedPremises) &&
-            $parsedConclusion == "$varNames[0] V $varNames[1]"
+            $parsedConclusion == "$varNames[0] ∨ $varNames[1]"
         ) {
             $inferenceRule = "Addition";
-            $steps = "<br>1. {$varNames[0]}: {$vars[$varNames[0]]} (Premise)<br>2. Conclusion:<br> {$varNames[0]} V {$varNames[1]}: {$vars[$varNames[0]]} or {$vars[$varNames[1]]}";
+            $steps = "<br>1. {$varNames[0]}: {$vars[$varNames[0]]} (Premise)<br>2. Conclusion:<br> {$varNames[0]} ∨ {$varNames[1]}: {$vars[$varNames[0]]} or {$vars[$varNames[1]]}";
             $valid = true;
         }
         // Resolution: If p ∨ q and ¬p ∨ r, then q ∨ r.
